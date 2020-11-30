@@ -1,5 +1,5 @@
 {
-    "name": "alyatek/jwt-signature-validation",
+    "name": "alyatek/jwt-signature-checker",
     "description": "Encrypts and Validates a jwt signature",
     "authors": [
         {
