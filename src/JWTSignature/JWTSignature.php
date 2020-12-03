@@ -23,7 +23,7 @@ class JWTSignature
 		}
 	}
 
-	public function encrypt(string $name = '', array $data = [])
+	public function sign(string $name = '', array $data = [])
 	{
 		$this->payload['sub']  = md5($name);
 		$this->payload['name'] = $name;
