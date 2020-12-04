@@ -8,7 +8,7 @@ class JWTSignature
 {
 	protected
 		$header = [
-			"alg" => "HS256",
+			"alg" => "SHA256",
 			"typ" => "JWT"
 		],
 		$payload = [],
@@ -33,7 +33,7 @@ class JWTSignature
 
 		$header = Base64Url::encode(json_encode($this->header));
 
-		$this->payload['iat'] = time();
+		$this->payload['data']['iat'] = time();
 
 		$payload = Base64Url::encode(json_encode($this->payload));
 
