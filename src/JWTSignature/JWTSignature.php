@@ -33,7 +33,6 @@ class JWTSignature
         $this->payload['iat'] = time();
 
         $header = Base64Url::encode(json_encode($this->header));
-
         $payload = Base64Url::encode(json_encode($this->payload));
 
         $string = "{$header}.{$payload}";
