@@ -21,6 +21,8 @@ class JWTSignature
 		if(JWT_SIGNATURE === null) {
 			throw new \Exception('Not set signature');
 		}
+
+		$this->key = JWT_SIGNATURE;
 	}
 
 	public function sign(string $name = '', array $data = [])
