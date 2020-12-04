@@ -27,14 +27,12 @@ class JWTSignature
 
     public function sign(string $name = '', array $data = [])
     {
+        $this->payload = $data;
         $this->payload['sub']  = md5($name);
         $this->payload['name'] = $name;
-
-        $this->payload = array_merge($this->payload, $data);
+        $this->payload['iat'] = time();
 
         $header = Base64Url::encode(json_encode($this->header));
-
-        $this->payload['iat'] = time();
 
         $payload = Base64Url::encode(json_encode($this->payload));
 
