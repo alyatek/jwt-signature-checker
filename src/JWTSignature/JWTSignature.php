@@ -6,74 +6,75 @@ use JWTSignature\Helpers\Base64Url;
 
 class JWTSignature
 {
-	protected
-		$header = [
-			"alg" => "SHA256",
-			"typ" => "JWT"
-		],
-		$payload = [],
-		$sign = [],
-		$key = '',
-		$name = '';
+    protected
+        $header = [
+        "alg" => "SHA256",
+        "typ" => "JWT"
+    ],
+        $payload = [],
+        $sign = [],
+        $key = '',
+        $name = '';
 
-	public function __construct()
-	{
-		if(JWT_SIGNATURE === null) {
-			throw new \Exception('Not set signature');
-		}
+    public function __construct()
+    {
+        if(JWT_SIGNATURE === null) {
+            throw new \Exception('Not set signature');
+        }
 
-		$this->key = JWT_SIGNATURE;
-	}
+        $this->key = JWT_SIGNATURE;
+    }
 
-	public function sign(string $name = '', array $data = [])
-	{
-		$this->payload['sub']  = md5($name);
-		$this->payload['name'] = $name;
-		$this->payload['data'] = $data;
+    public function sign(string $name = '', array $data = [])
+    {
+        $this->payload['sub']  = md5($name);
+        $this->payload['name'] = $name;
 
-		$header = Base64Url::encode(json_encode($this->header));
+        $this->payload = array_merge($this->payload, $data);
 
-		$this->payload['data']['iat'] = time();
+        $header = Base64Url::encode(json_encode($this->header));
 
-		$payload = Base64Url::encode(json_encode($this->payload));
+        $this->payload['iat'] = time();
 
-		$string = "{$header}.{$payload}";
+        $payload = Base64Url::encode(json_encode($this->payload));
 
-		$signature = Base64Url::encode(hash_hmac('SHA256', $string, $this->key, true));
+        $string = "{$header}.{$payload}";
 
-		$hash = "{$string}.{$signature}";
+        $signature = Base64Url::encode(hash_hmac('SHA256', $string, $this->key, true));
 
-		return $hash;
-	}
+        $hash = "{$string}.{$signature}";
 
-	public function validate($jwt_token)
-	{
-		if (empty($jwt_token)) {
-			return ['status' => false, 'msg' => 'JWT is empty'];
-		}
+        return $hash;
+    }
 
-		$explode = explode('.', $jwt_token);
+    public function validate($jwt_token)
+    {
+        if (empty($jwt_token)) {
+            return ['status' => false, 'msg' => 'JWT is empty'];
+        }
 
-		$signature = Base64Url::decode($explode[2]);
-		$string  = "{$explode[0]}.{$explode[1]}";
+        $explode = explode('.', $jwt_token);
 
-		if (hash_equals($signature, hash_hmac('SHA256', $string, $this->key, true))) {
-			$header  = json_decode(Base64Url::decode($explode[0]), true);
-			$payload = json_decode(Base64Url::decode($explode[1]), true);
+        $signature = Base64Url::decode($explode[2]);
+        $string  = "{$explode[0]}.{$explode[1]}";
 
-			$timestamp = intval($payload['iat']) + (60 * 5);
+        if (hash_equals($signature, hash_hmac('SHA256', $string, $this->key, true))) {
+            $header  = json_decode(Base64Url::decode($explode[0]), true);
+            $payload = json_decode(Base64Url::decode($explode[1]), true);
 
-			if (time() > $timestamp) {
-				return ['status' => false, 'msg' => 'Timestamp invalid.'];
-			}
+            $timestamp = intval($payload['iat']) + (60 * 5);
 
-			return [
-				'status'  => true,
-				'header'  => $header,
-				'payload' => $payload,
-			];
-		}
+            if (time() > $timestamp) {
+                return ['status' => false, 'msg' => 'Timestamp invalid.'];
+            }
 
-		return ['status' => false, 'msg' => 'Signature not valid.'];
-	}
+            return [
+                'status'  => true,
+                'header'  => $header,
+                'payload' => $payload,
+            ];
+        }
+
+        return ['status' => false, 'msg' => 'Signature not valid.'];
+    }
 }
