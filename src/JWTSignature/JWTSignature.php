@@ -29,7 +29,6 @@ class JWTSignature
     {
         $this->payload = $data;
         $this->payload['sub']  = md5($name);
-        $this->payload['name'] = $name;
         $this->payload['iat'] = time();
 
         $header = Base64Url::encode(json_encode($this->header));
