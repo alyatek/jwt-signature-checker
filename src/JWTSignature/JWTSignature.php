@@ -8,9 +8,9 @@ class JWTSignature
 {
     protected
         $header = [
-        "alg" => "SHA256",
-        "typ" => "JWT"
-    ],
+            "alg" => "HS256",
+            "typ" => "JWT"
+        ],
         $payload = [],
         $sign = [],
         $key = '',
@@ -18,7 +18,7 @@ class JWTSignature
 
     public function __construct()
     {
-        if(JWT_SIGNATURE === null) {
+        if (JWT_SIGNATURE === null) {
             throw new \Exception('Not set signature');
         }
 
